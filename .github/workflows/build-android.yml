@@ -74,11 +74,30 @@ jobs:
         ./gradlew assembleDebug --stacktrace --debug 2>&1 | head -500
         echo "Debug APK build completed!"
 
-    - name: Check build output
+    - name: Check build output directory structure
       run: |
-        echo "Checking build output..."
-        ls -la android/app/build/outputs/apk/
-        ls -la android/app/build/outputs/apk/debug/
+        echo "Checking build directory structure..."
+        if [ -d "android/build/" ]; then
+          ls -la android/build/
+          if [ -d "android/build/outputs/" ]; then
+            ls -la android/build/outputs/
+            if [ -d "android/build/outputs/apk/" ]; then
+              ls -la android/build/outputs/apk/
+              if [ -d "android/build/outputs/apk/debug/" ]; then
+                ls -la android/build/outputs/apk/debug/
+              else
+                echo "Debug APK directory does not exist!"
+              fi
+            else
+              echo "APK output directory does not exist!"
+            fi
+          else
+            echo "Outputs directory does not exist!"
+          fi
+        else
+          echo "Build directory does not exist!"
+        fi
+        echo "Build directory structure check completed!"
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
