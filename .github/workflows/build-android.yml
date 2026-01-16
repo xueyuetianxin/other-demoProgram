@@ -58,7 +58,7 @@ jobs:
         echo "Checking Android project structure..."
         ls -la android/
         ls -la android/app/
-        ls -la android/capacitor-android/
+        ls -la android/capacitor-cordova-android-plugins/
         echo "Android project structure check completed!"
 
     - name: Debug Gradle version
