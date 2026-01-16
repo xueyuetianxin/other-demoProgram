@@ -26,8 +26,16 @@ jobs:
     - name: Build web project
       run: npm run build
 
-    - name: Install Capacitor dependencies
-      run: npm install @capacitor/android@^8.0.1
+    - name: Check Capacitor dependencies
+      run: |
+        echo "Checking Capacitor dependencies..."
+        if [ ! -d "node_modules/@capacitor/android/" ]; then
+          echo "Installing Capacitor Android dependencies..."
+          npm install @capacitor/android@^8.0.1
+        else
+          echo "Capacitor Android dependencies already exist, skipping installation."
+        fi
+        echo "Capacitor dependencies check completed!"
 
     - name: Initialize Capacitor Android project if not exists
       run: |
@@ -53,71 +61,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
-    - name: Debug Android project structure
-      run: |
-        echo "Checking Android project structure..."
-        ls -la android/
-        ls -la android/app/
-        ls -la android/capacitor-cordova-android-plugins/
-        echo "Android project structure check completed!"
-
-    - name: Debug Gradle version
-      run: |
-        echo "Checking Gradle version..."
-        android/gradlew --version
-        echo "Gradle version check completed!"
-
-    - name: Debug Android dependencies
-      run: |
-        echo "Checking Android dependencies..."
-        cd android
-        ./gradlew dependencies --configuration debugCompileClasspath --stacktrace | head -100
-        echo "Android dependencies check completed!"
-
-    - name: Debug environment variables
-      run: |
-        echo "Checking environment variables..."
-        echo "JAVA_HOME: $JAVA_HOME"
-        echo "PATH: $PATH"
-        echo "Android SDK path: $ANDROID_HOME"
-        echo "Java version: $(java -version 2>&1 | head -1)"
-        echo "Environment variables check completed!"
-
-    - name: Debug Android project structure before build
-      run: |
-        echo "Checking Android project structure before build..."
-        ls -la android/
-        ls -la android/app/src/
-        ls -la android/app/src/main/
-        echo "Android project structure before build check completed!"
-
     - name: Build Debug APK
       run: |
         echo "Building Debug APK..."
         cd android
-        ./gradlew assembleDebug --stacktrace --info
-        echo "Debug APK build completed!"
-
-    - name: Check build output directory
-      run: |
-        echo "Checking build output directory..."
-        ls -la android/app/build/
-        ls -la android/app/build/outputs/
-        if [ -d "android/app/build/outputs/apk/" ]; then
-          ls -la android/app/build/outputs/apk/
-          if [ -d "android/app/build/outputs/apk/debug/" ]; then
-            ls -la android/app/build/outputs/apk/debug/
-          else
-            echo "Debug APK directory does not exist!"
-          fi
-        else
-          echo "APK output directory does not exist!"
-        fi
-        echo "Build output directory check completed!"
+        ./gradlew assembleDebug --stacktrace
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
-      if: success()
       with:
         name: debug-apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
@@ -128,11 +79,9 @@ jobs:
         echo "Building Release APK..."
         cd android
         ./gradlew assembleRelease --stacktrace
-        echo "Release APK build completed!"
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
-      if: success()
       with:
         name: release-apk
         path: android/app/build/outputs/apk/release/app-release-unsigned.apk
