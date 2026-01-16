@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
@@ -31,15 +31,10 @@ jobs:
       with:
         xcode-version: 'latest-stable'
 
-    - name: Install CocoaPods
-      run: |
-        cd ios
-        pod install
-
     - name: Build iOS App
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace \
+        xcodebuild -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
           -sdk iphonesimulator \
@@ -49,7 +44,7 @@ jobs:
     - name: Archive iOS App
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace \
+        xcodebuild -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
           -sdk iphonesimulator \
