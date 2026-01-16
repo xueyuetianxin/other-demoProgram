@@ -31,25 +31,30 @@ jobs:
       with:
         xcode-version: 'latest-stable'
 
+    - name: Sync Capacitor iOS
+      run: npx cap sync ios
+
     - name: Build iOS App
       run: |
         cd ios/App
-        xcodebuild -project App.xcodeproj \
+        xcodebuild clean build \
+          -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
           -sdk iphonesimulator \
           -derivedDataPath DerivedData \
-          build
+          -verbose
 
     - name: Archive iOS App
       run: |
         cd ios/App
-        xcodebuild -project App.xcodeproj \
+        xcodebuild archive \
+          -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
           -sdk iphonesimulator \
           -archivePath DerivedData/App.xcarchive \
-          archive
+          -verbose
 
     - name: Export IPA
       run: |
@@ -57,7 +62,8 @@ jobs:
         xcodebuild -exportArchive \
           -archivePath DerivedData/App.xcarchive \
           -exportPath DerivedData/IPA \
-          -exportOptionsPlist exportOptions.plist
+          -exportOptionsPlist exportOptions.plist \
+          -verbose
 
     - name: Upload IPA
       uses: actions/upload-artifact@v4
