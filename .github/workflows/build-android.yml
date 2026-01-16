@@ -69,9 +69,9 @@ jobs:
 
     - name: Build Debug APK
       run: |
-        echo "Building Debug APK..."
+        echo "Building Debug APK with detailed logs..."
         cd android
-        ./gradlew assembleDebug --stacktrace --info
+        ./gradlew assembleDebug --stacktrace --debug 2>&1 | head -500
         echo "Debug APK build completed!"
 
     - name: Check build output
