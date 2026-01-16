@@ -58,6 +58,15 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
+    - name: Gradle cache
+      uses: gradle/gradle-build-action@v2
+
+    - name: Install Android SDK components
+      run: |
+        echo "Installing Android SDK components..."
+        yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653" "cmdline-tools;latest"
+        echo "Android SDK components installation completed!"
+
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
@@ -65,7 +74,14 @@ jobs:
       run: |
         echo "Building Debug APK..."
         cd android
-        ./gradlew assembleDebug --stacktrace
+        ./gradlew assembleDebug --stacktrace --info
+        echo "Debug APK build completed!"
+
+    - name: Check build output
+      run: |
+        echo "Checking build output..."
+        ls -la android/app/build/outputs/apk/
+        ls -la android/app/build/outputs/apk/debug/
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -79,6 +95,7 @@ jobs:
         echo "Building Release APK..."
         cd android
         ./gradlew assembleRelease --stacktrace
+        echo "Release APK build completed!"
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
