@@ -53,10 +53,33 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
+    - name: Debug Android project structure
+      run: |
+        echo "Checking Android project structure..."
+        ls -la android/
+        ls -la android/app/
+        ls -la android/capacitor-android/
+        echo "Android project structure check completed!"
+
+    - name: Debug Gradle version
+      run: |
+        echo "Checking Gradle version..."
+        android/gradlew --version
+        echo "Gradle version check completed!"
+
+    - name: Debug Android dependencies
+      run: |
+        echo "Checking Android dependencies..."
+        cd android
+        ./gradlew dependencies --configuration debugCompileClasspath --stacktrace | head -100
+        echo "Android dependencies check completed!"
+
     - name: Build Debug APK
       run: |
+        echo "Building Debug APK..."
         cd android
         ./gradlew assembleDebug --stacktrace
+        echo "Debug APK build completed!"
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -68,8 +91,10 @@ jobs:
 
     - name: Build Release APK
       run: |
+        echo "Building Release APK..."
         cd android
         ./gradlew assembleRelease --stacktrace
+        echo "Release APK build completed!"
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
