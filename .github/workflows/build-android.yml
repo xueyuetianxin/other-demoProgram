@@ -58,14 +58,11 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Gradle cache
       uses: gradle/gradle-build-action@v2
-
-    - name: Install Android SDK components
-      run: |
-        echo "Installing Android SDK components..."
-        yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653" "cmdline-tools;latest"
-        echo "Android SDK components installation completed!"
 
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
