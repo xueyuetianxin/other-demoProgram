@@ -18,7 +18,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22'
+        node-version: '20'
 
     - name: Install dependencies
       run: npm ci
@@ -26,16 +26,18 @@ jobs:
     - name: Build web project
       run: npm run build
 
-    - name: Check Capacitor dependencies
+    - name: Verify web build output
       run: |
-        echo "Checking Capacitor dependencies..."
-        if [ ! -d "node_modules/@capacitor/android/" ]; then
-          echo "Installing Capacitor Android dependencies..."
-          npm install @capacitor/android@^8.0.1
+        echo "Verifying web build output..."
+        if [ -d "dist" ]; then
+          ls -la dist
         else
-          echo "Capacitor Android dependencies already exist, skipping installation."
+          echo "ERROR: Web build output directory 'dist' not found!"
+          exit 1
         fi
-        echo "Capacitor dependencies check completed!"
+
+    - name: Install Capacitor dependencies
+      run: npm install @capacitor/android@^8.0.1
 
     - name: Initialize Capacitor Android project if not exists
       run: |
@@ -58,20 +60,33 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
     - name: Gradle cache
       uses: gradle/gradle-build-action@v2
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
+    - name: Check environment information
+      run: |
+        echo "=== Environment Information ==="
+        node --version
+        npm --version
+        java -version
+        ./android/gradlew --version
+        echo "=== End Environment Information ==="
+
     - name: Build Debug APK
+      id: build-debug
       run: |
         echo "Building Debug APK with detailed logs..."
         cd android
-        ./gradlew assembleDebug --stacktrace --debug 2>&1 | head -500
+        if ! ./gradlew assembleDebug --stacktrace --info; then
+          echo "Debug APK build failed! Check the logs above for details."
+          exit 1
+        fi
         echo "Debug APK build completed!"
 
     - name: Check build output directory structure
@@ -112,10 +127,14 @@ jobs:
         retention-days: 30
 
     - name: Build Release APK
+      id: build-release
       run: |
-        echo "Building Release APK..."
+        echo "Building Release APK with detailed logs..."
         cd android
-        ./gradlew assembleRelease --stacktrace
+        if ! ./gradlew assembleRelease --stacktrace --info; then
+          echo "Release APK build failed! Check the logs above for details."
+          exit 1
+        fi
         echo "Release APK build completed!"
 
     - name: Upload Release APK
