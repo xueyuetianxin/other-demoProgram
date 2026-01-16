@@ -77,16 +77,21 @@ jobs:
     - name: Check build output directory structure
       run: |
         echo "Checking build directory structure..."
-        if [ -d "android/build/" ]; then
-          ls -la android/build/
-          if [ -d "android/build/outputs/" ]; then
-            ls -la android/build/outputs/
-            if [ -d "android/build/outputs/apk/" ]; then
-              ls -la android/build/outputs/apk/
-              if [ -d "android/build/outputs/apk/debug/" ]; then
-                ls -la android/build/outputs/apk/debug/
+        if [ -d "android/app/build/" ]; then
+          ls -la android/app/build/
+          if [ -d "android/app/build/outputs/" ]; then
+            ls -la android/app/build/outputs/
+            if [ -d "android/app/build/outputs/apk/" ]; then
+              ls -la android/app/build/outputs/apk/
+              if [ -d "android/app/build/outputs/apk/debug/" ]; then
+                ls -la android/app/build/outputs/apk/debug/
               else
                 echo "Debug APK directory does not exist!"
+              fi
+              if [ -d "android/app/build/outputs/apk/release/" ]; then
+                ls -la android/app/build/outputs/apk/release/
+              else
+                echo "Release APK directory does not exist!"
               fi
             else
               echo "APK output directory does not exist!"
