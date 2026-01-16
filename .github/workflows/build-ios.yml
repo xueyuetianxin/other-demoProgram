@@ -62,48 +62,42 @@ jobs:
         rm -rf DerivedData
         mkdir -p DerivedData
 
-    - name: Build iOS App with signing disabled
+    - name: Build iOS App for Simulator
       run: |
-        echo "Building iOS App..."
+        echo "Building iOS App for Simulator..."
         cd ios/App
         xcodebuild clean build \
           -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
-          -sdk iphoneos \
+          -sdk iphonesimulator \
           -derivedDataPath DerivedData \
-          -allowProvisioningUpdates \
           -verbose
-        echo "Build completed!"
+        echo "Simulator build completed!"
 
-    - name: Archive iOS App with signing disabled
+    - name: Archive iOS App for Simulator
       run: |
-        echo "Archiving iOS App..."
+        echo "Archiving iOS App for Simulator..."
         cd ios/App
         xcodebuild archive \
           -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
-          -sdk iphoneos \
+          -sdk iphonesimulator \
           -archivePath DerivedData/App.xcarchive \
-          -allowProvisioningUpdates \
           -verbose
-        echo "Archive completed!"
+        echo "Simulator archive completed!"
 
-    - name: Export IPA with signing disabled
+    - name: Export Simulator App
       run: |
-        echo "Exporting IPA..."
+        echo "Exporting Simulator App..."
         cd ios/App
-        xcodebuild -exportArchive \
-          -archivePath DerivedData/App.xcarchive \
-          -exportPath DerivedData/IPA \
-          -exportOptionsPlist exportOptions.plist \
-          -allowProvisioningUpdates \
-          -verbose
-        echo "IPA export completed!"
+        mkdir -p DerivedData/App
+        cp -R DerivedData/Build/Products/Debug-iphonesimulator/App.app DerivedData/App/
+        echo "Simulator app export completed!"
 
-    - name: Upload IPA
+    - name: Upload Simulator App
       uses: actions/upload-artifact@v4
       with:
-        name: ios-ipa
-        path: ios/App/DerivedData/IPA/App.ipa
+        name: ios-simulator-app
+        path: ios/App/DerivedData/App/
