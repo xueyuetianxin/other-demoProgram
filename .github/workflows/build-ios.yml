@@ -49,8 +49,20 @@ jobs:
       run: |
         cd ios/App
         ls -la
+        ls -la App
 
-    - name: Build iOS App
+    - name: Check Xcode scheme
+      run: |
+        cd ios/App
+        xcodebuild -list -project App.xcodeproj
+
+    - name: Clean build directory
+      run: |
+        cd ios/App
+        rm -rf DerivedData
+        mkdir -p DerivedData
+
+    - name: Build iOS App with signing disabled
       run: |
         echo "Building iOS App..."
         cd ios/App
@@ -60,10 +72,11 @@ jobs:
           -configuration Debug \
           -sdk iphoneos \
           -derivedDataPath DerivedData \
+          -allowProvisioningUpdates \
           -verbose
         echo "Build completed!"
 
-    - name: Archive iOS App
+    - name: Archive iOS App with signing disabled
       run: |
         echo "Archiving iOS App..."
         cd ios/App
@@ -73,10 +86,11 @@ jobs:
           -configuration Debug \
           -sdk iphoneos \
           -archivePath DerivedData/App.xcarchive \
+          -allowProvisioningUpdates \
           -verbose
         echo "Archive completed!"
 
-    - name: Export IPA
+    - name: Export IPA with signing disabled
       run: |
         echo "Exporting IPA..."
         cd ios/App
@@ -84,6 +98,7 @@ jobs:
           -archivePath DerivedData/App.xcarchive \
           -exportPath DerivedData/IPA \
           -exportOptionsPlist exportOptions.plist \
+          -allowProvisioningUpdates \
           -verbose
         echo "IPA export completed!"
 
