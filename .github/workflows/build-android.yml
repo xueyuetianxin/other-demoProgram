@@ -18,13 +18,31 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22'
+        node-version: '20'
 
     - name: Install dependencies
       run: npm ci
 
-    - name: Build project
+    - name: Build web project
       run: npm run build
+
+    - name: Install Capacitor dependencies
+      run: npm install @capacitor/android@^8.0.1
+
+    - name: Initialize Capacitor Android project if not exists
+      run: |
+        if [ ! -d "android/app" ]; then
+          echo "Initializing Capacitor Android project..."
+          npx cap add android
+        else
+          echo "Capacitor Android project already exists, skipping initialization."
+        fi
+
+    - name: Sync Capacitor Android
+      run: |
+        echo "Syncing Capacitor Android..."
+        npx cap sync android
+        echo "Sync completed!"
 
     - name: Setup Java
       uses: actions/setup-java@v4
