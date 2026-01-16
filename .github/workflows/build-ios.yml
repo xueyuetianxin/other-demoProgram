@@ -45,7 +45,7 @@ jobs:
           -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
-          -sdk iphonesimulator \
+          -sdk iphoneos \
           -derivedDataPath DerivedData \
           -verbose
         echo "Build completed!"
@@ -58,7 +58,7 @@ jobs:
           -project App.xcodeproj \
           -scheme App \
           -configuration Debug \
-          -sdk iphonesimulator \
+          -sdk iphoneos \
           -archivePath DerivedData/App.xcarchive \
           -verbose
         echo "Archive completed!"
