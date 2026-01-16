@@ -31,11 +31,24 @@ jobs:
       with:
         xcode-version: 'latest-stable'
 
+    - name: Show Xcode version
+      run: |
+        xcodebuild -version
+        xcode-select -p
+
+    - name: Show Node.js version
+      run: node --version
+
     - name: Sync Capacitor iOS
       run: |
         echo "Syncing Capacitor iOS..."
         npx cap sync ios
         echo "Sync completed!"
+
+    - name: Show project structure
+      run: |
+        cd ios/App
+        ls -la
 
     - name: Build iOS App
       run: |
