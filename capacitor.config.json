@@ -1,9 +1,0 @@
-{
-  "appId": "com.rental.app",
-  "appName": "租赁管理系统",
-  "webDir": "dist",
-  "bundledWebRuntime": false,
-  "server": {
-    "androidScheme": "https"
-  }
-}
