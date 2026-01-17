@@ -74,33 +74,36 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
-    - name: Build Debug APK
+    - name: Build Debug APK with detailed logs
       id: build-debug
       run: |
-        echo "Building Debug APK..."
+        echo "Building Debug APK with detailed logs..."
         cd android
-        ./gradlew assembleDebug --stacktrace
+        ./gradlew assembleDebug --stacktrace --debug --no-daemon
 
-    - name: Check build output
+    - name: Check build output if successful
+      if: success()
       run: |
         echo "Checking build output..."
         ls -la android/app/build/outputs/apk/debug/
 
-    - name: Upload Debug APK
+    - name: Upload Debug APK if successful
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: debug-apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
 
-    - name: Build Release APK
+    - name: Build Release APK with detailed logs
       id: build-release
       run: |
-        echo "Building Release APK..."
+        echo "Building Release APK with detailed logs..."
         cd android
-        ./gradlew assembleRelease --stacktrace
+        ./gradlew assembleRelease --stacktrace --debug --no-daemon
 
-    - name: Upload Release APK
+    - name: Upload Release APK if successful
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: release-apk
