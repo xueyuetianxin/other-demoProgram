@@ -66,6 +66,12 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Install Android SDK components
+      run: |
+        echo "=== Installing Android SDK components ==="
+        yes | sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "extras;google;m2repository" "extras;android;m2repository"
+        echo "=== SDK components installed ==="
+
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
@@ -76,18 +82,40 @@ jobs:
         npm --version
         java -version
         ./android/gradlew --version
+        echo "=== Android SDK Components ==="
+        sdkmanager --list_installed
+        echo "=== Gradle Properties ==="
+        cat android/gradle.properties
         echo "=== End Environment Information ==="
+
+    - name: Check Android project structure
+      run: |
+        echo "=== Android Project Structure ==="
+        ls -la android
+        ls -la android/app/src
+        ls -la android/capacitor-cordova-android-plugins 2>/dev/null || echo "capacitor-cordova-android-plugins directory not found"
+        echo "=== End Project Structure ==="
 
     - name: Build Debug APK
       id: build-debug
       run: |
-        echo "Building Debug APK with detailed logs..."
+        echo "=== Building Debug APK with maximum verbosity ==="
         cd android
-        if ! ./gradlew assembleDebug --stacktrace --info; then
-          echo "Debug APK build failed! Check the logs above for details."
+        # Run Gradle with maximum verbosity for debugging
+        if ! ./gradlew assembleDebug --stacktrace --debug --no-daemon; then
+          echo "=== Debug APK build failed! ==="
+          echo "=== Checking for common build issues ==="
+          # Check if capacitor-android module exists
+          if [ ! -d "../node_modules/@capacitor/android/capacitor" ]; then
+            echo "ERROR: capacitor-android module not found!"
+          fi
+          # Check if cordova plugins module exists  
+          if [ ! -d "capacitor-cordova-android-plugins" ]; then
+            echo "ERROR: capacitor-cordova-android-plugins directory not found!"
+          fi
           exit 1
         fi
-        echo "Debug APK build completed!"
+        echo "=== Debug APK build completed! ==="
 
     - name: Check build output directory structure
       run: |
@@ -129,13 +157,15 @@ jobs:
     - name: Build Release APK
       id: build-release
       run: |
-        echo "Building Release APK with detailed logs..."
+        echo "=== Building Release APK with maximum verbosity ==="
         cd android
-        if ! ./gradlew assembleRelease --stacktrace --info; then
-          echo "Release APK build failed! Check the logs above for details."
+        # Run Gradle with maximum verbosity for debugging
+        if ! ./gradlew assembleRelease --stacktrace --debug --no-daemon; then
+          echo "=== Release APK build failed! ==="
+          echo "=== Checking for common build issues ==="
           exit 1
         fi
-        echo "Release APK build completed!"
+        echo "=== Release APK build completed! ==="
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
